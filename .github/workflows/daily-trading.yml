@@ -1,0 +1,36 @@
+name: Daily Paper Trading Cycle
+
+on:
+  schedule:
+    - cron: '0 14 * * 1-5'   # 14:00 UTC, Mon-Fri (~before/around US market hours)
+  workflow_dispatch: {}       # lets you trigger it manually from the Actions tab, for testing
+
+jobs:
+  run-trading-cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run one trading cycle
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          APCA_API_BASE_URL: https://paper-api.alpaca.markets
+        run: python run_once.py
+
+      - name: Commit updated rebalance state and logs
+        run: |
+          git config user.name "trading-bot"
+          git config user.email "actions@github.com"
+          git add logs/
+          git diff --cached --quiet || git commit -m "Automated: rebalance state $(date -u +%Y-%m-%d)"
+          git push
