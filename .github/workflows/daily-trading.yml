@@ -34,3 +34,4 @@ jobs:
           git add logs/
           git diff --cached --quiet || git commit -m "Automated: rebalance state $(date -u +%Y-%m-%d)"
           git push
+ 
