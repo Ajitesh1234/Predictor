@@ -187,7 +187,12 @@ class AlpacaPaperExecutionEngine:
                 orders.append({**event, "action": side, "order": None})
                 continue
 
-            order = self.submit_market_order(ticker, quantity, side)
-            orders.append({**event, "action": side, "order": order})
+            try:
+                order = self.submit_market_order(ticker, quantity, side)
+                orders.append({**event, "action": side, "order": order})
+            except RuntimeError as exc:
+                print(f"[SKIPPED ORDER] {side.upper()} {quantity} {ticker} -> {exc}")
+                orders.append({**event, "action": f"{side}_failed", "order": None, "error": str(exc)})
+                continue
 
         return orders
