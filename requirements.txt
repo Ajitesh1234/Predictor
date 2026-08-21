@@ -1,10 +1,11 @@
 pandas
 numpy
 scipy
-lightgbm
+lightgbm==4.5.0
 joblib
 pyarrow
 requests
 yfinance
 alpaca-py
 prometheus-client
+scikit-learn==1.5.2
